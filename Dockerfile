@@ -7,7 +7,8 @@ WORKDIR /app
 # Install app dependencies
 COPY package.json /app
 COPY package-lock.json /app
-RUN npm ci --only=production && npm cache clean --force
+# RUN npm ci --only=production && npm cache clean --force
+RUN npm install
 COPY . /app
 
 CMD node index.js
