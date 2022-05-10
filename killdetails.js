@@ -1,11 +1,7 @@
-const WebSocket = require('ws');
-const ReconnectingWebSocket = require('reconnecting-websocket');
-const { WebhookClient } = require('discord.js');
-const mysql = require('mysql2/promise');
+
 const { createLogger, format, transports } = require("winston");
 var config = require("./config.json");
 const fetch = require('cross-fetch');
-const { mainModule } = require('process');
 
 // ChainKillChecker
 // logger - winston logger instance
@@ -36,7 +32,7 @@ class KillDetails {
         this.attackersCount = zkillStreamKill.attackers.length;
         this.systemId = zkillStreamKill.solar_system_id;
         this.systemName = '';
-        this.iskValue = zkillStreamKill.totalValue;
+        this.iskValue = zkillStreamKill.zkb.totalValue;
     }
 
     allianceURL = "https://esi.evetech.net/latest/alliances/@0/?datasource=tranquility";
@@ -117,9 +113,9 @@ const logger = createLogger({
 
 async function test() {
     var testObj = {"attackers":[{"alliance_id":99004295,"character_id":96726904,"corporation_id":98578883,"damage_done":572,"final_blow":true,"security_status":-2.3,"ship_type_id":16242,"weapon_type_id":2977}],"killmail_id":100721758,"killmail_time":"2022-05-09T17:52:19Z","solar_system_id":30000142,"victim":{"character_id":95675904,"corporation_id":1000115,"damage_taken":572,"items":[{"flag":5,"item_type_id":21200,"quantity_dropped":5,"singleton":0},{"flag":20,"item_type_id":30328,"quantity_dropped":1,"singleton":0},{"flag":5,"item_type_id":49621,"quantity_destroyed":1,"singleton":0},{"flag":5,"item_type_id":46001,"quantity_dropped":48,"singleton":0},{"flag":27,"item_type_id":3640,"quantity_dropped":1,"singleton":0},{"flag":5,"item_type_id":13976,"quantity_dropped":1,"singleton":0},{"flag":5,"item_type_id":43530,"quantity_dropped":1,"singleton":0},{"flag":5,"item_type_id":14070,"quantity_dropped":1,"singleton":0},{"flag":5,"item_type_id":34746,"quantity_destroyed":2,"singleton":0},{"flag":5,"item_type_id":33577,"quantity_destroyed":2,"singleton":0},{"flag":5,"item_type_id":46004,"quantity_destroyed":41,"singleton":0},{"flag":5,"item_type_id":21206,"quantity_dropped":1,"singleton":0},{"flag":5,"item_type_id":42754,"quantity_destroyed":1,"singleton":0},{"flag":5,"item_type_id":42773,"quantity_destroyed":1,"singleton":0},{"flag":11,"item_type_id":2046,"quantity_dropped":1,"singleton":0},{"flag":5,"item_type_id":46002,"quantity_destroyed":8,"singleton":0},{"flag":5,"item_type_id":34732,"quantity_destroyed":1,"singleton":0},{"flag":5,"item_type_id":19406,"quantity_destroyed":1,"singleton":0},{"flag":5,"item_type_id":14088,"quantity_dropped":1,"singleton":0},{"flag":5,"item_type_id":42784,"quantity_destroyed":1,"singleton":0},{"flag":19,"item_type_id":30420,"quantity_destroyed":1,"singleton":0},{"flag":5,"item_type_id":14027,"quantity_destroyed":1,"singleton":0}],"position":{"x":-4067676871603.42,"y":-710577074290.6902,"z":-3956622579324.895},"ship_type_id":606},"zkb":{"locationID":50001249,"hash":"5da58e8b0eccb88357a1e7b2a4abc7853a1bcb1d","fittedValue":18843.02,"droppedValue":56349144.21,"destroyedValue":52239034.27,"totalValue":108588178.48,"points":6,"npc":false,"solo":false,"awox":false,"esi":"https:\/\/esi.evetech.net\/latest\/killmails\/100721758\/5da58e8b0eccb88357a1e7b2a4abc7853a1bcb1d\/","url":"https:\/\/zkillboard.com\/kill\/100721758\/"}};
-    var testEmbed = new KillEmbed(logger, config, testObj);
-    await testEmbed.GetRelatedData();
+    var testDetails = new KillDetails(logger, config, testObj);
+    await testDetails.GetKillDetails();
 }
-test();
+//test();
 
 module.exports = { KillDetails }

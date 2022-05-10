@@ -32,7 +32,7 @@ class ChainKillChecker {
     MIN_TO_GET_LATEST_SYSTEMS = 0;
     MIN_TO_SEND_DISCORD_STATUS = config.discordStatusReportMins;
     systems = [];
-    mapCharacterIds = [];
+    mapCharacters = [];
     lastUpdateTime = Date.now();
     lastDiscordStatusTime = Date.now();
 
@@ -51,11 +51,18 @@ class ChainKillChecker {
         });
     }
 
-    sendCorpKillMessage (messageBody) {
-        const webhookClient = new WebhookClient({ id: this.config.discordCorpkillWebhookId, token: this.config.discordCorpkillWebhookToken });
+    async sendCorpKillMessage (zkillMessage, isKill) {
+
+        var killDetails = new KillDetails(logger, config, zkillMessage);
+        await killDetails.GetKillDetails();
+        killDetails.isKill = isKill;
+        var killEmbed = new KillEmbed(logger, config, killDetails);
+        var embed = killEmbed.CreateEmbed();
+
+        const webhookClient = new WebhookClient({ id: config.discordCorpkillWebhookId, token: config.discordCorpkillWebhookToken });
 
         webhookClient.send({
-            content: messageBody,
+            embeds: [embed],
         });
     }
 
@@ -100,14 +107,11 @@ class ChainKillChecker {
             var connection = await mysql.createConnection(this.dbConfig)
               .catch(err => { throw err; });
 
-            await connection.execute('select characterId from character_map  where mapId in (?) and active = 1', [this.mapIds])
+            await connection.execute('select cm.characterId, c.corporationId, c.allianceId from character_map cm inner join `character` c on c.id = cm.characterId where cm.mapId in (?) and cm.active = 1', [this.mapIds])
                 .then( ([rows,fields]) => { 
-                    this.mapCharacterIds=rows; 
-                    this.logger.debug(this.mapCharacterIds);
+                    this.mapCharacters = rows;
                 })
                 .catch(err => { throw err; });
-
-            //this.mapCharacterIds=rows;
             connection.end();
             return;
         }
@@ -211,8 +215,9 @@ class ChainKillChecker {
                 this.logger.error("[fullSystemCheck] - Name match failure for systemId:" + systemId + ",name=" + rows[0].name);
             }
             else {
-                this.logger.error("[fullSystemCheck] - No systems details found for systemId : " + systemId);
-                await this.sendInfoMessage("[fullSystemCheck] - No systems details found for systemId : " + systemId);
+                // This will happen frequently for beginner systems
+                this.logger.debug("[fullSystemCheck] - No systems details found for systemId : " + systemId);
+                //await this.sendInfoMessage("[fullSystemCheck] - No systems details found for systemId : " + systemId);
             }
 
             connection.end();
@@ -240,26 +245,56 @@ class ChainKillChecker {
         if (minSinceLastSystemsUpdate > this.MIN_TO_GET_LATEST_SYSTEMS) {
             await this.updateSystems();
         }
-    
-        // Check if this is a system in a map
-        var systemSearchResults = this.systems.filter(s => s.systemId == messageData.solar_system_id);
-        if (systemSearchResults.length > 0 && !this.ignoreSystemIds.includes(messageData.solar_system_id)) {
-            this.logger.debug('SystemId (' + messageData.solar_system_id + ') matched one in the list.  Checking characters.');
-            
-            // Check character Ids
-            var matchedAttackers = messageData.attackers.filter(d => this.mapCharacterIds.some(mapChars => mapChars.characterId == d.character_id));
-            if (matchedAttackers.length == 0) {
-                this.logger.debug("zero character matched.");
-                var post = "@here A ship just died in " + systemSearchResults[0].alias + " to " + messageData.attackers.length + " people, zkill link: https://zkillboard.com/kill/" + messageData.killmail_id + "/";
-                this.updateSystemStatus(messageData.solar_system_id, 4);
-                this.sendChainMessage(post);
-            } 
-            else {
-                this.logger.debug("Skipped sendings, found matching characters.  Char[0]=" + matchedAttackers[0].character_id);
-            }
+
+        // Check if this is a corp/alliance in the map, which would mean we send the mail to the kill channel (old insight)
+        var matchedCorpKill = false;
+        var isKill = false;
+        var allianceId = messageData.victim.alliance_id ? messageData.victim.alliance_id : -1;
+        var matchedVictim = this.mapCharacters.filter(mapChars => mapChars.corporationId == messageData.victim.corporation_id || mapChars.corporationId == allianceId);
+        if (matchedVictim.length > 0) {
+            isKill = false;
+            matchedCorpKill = true;
         }
         else {
-            this.fullSystemCheck(messageData.solar_system_id);
+            var matchedAttackersCorp = messageData.attackers.filter(d => this.mapCharacters.some(mapChars => mapChars.corporationId == d.character_id));
+            if (matchedAttackersCorp.length > 0) {
+                isKill = true;
+                matchedCorpKill = true;
+            }
+            else {
+                var matchedAttackersAlli = messageData.attackers.filter(d => this.mapCharacters.some(mapChars => mapChars.allianceId == d.alliance_id));
+                if (matchedAttackersAlli.length > 0) {
+                    isKill = true;
+                    matchedCorpKill = true;
+                }
+            }
+        }
+
+
+        if (matchedCorpKill) {
+            sendCorpKillMessage(messageData, isKill);
+        }
+        else {
+            // Check if this is a system in a map
+            var systemSearchResults = this.systems.filter(s => s.systemId == messageData.solar_system_id);
+            if (systemSearchResults.length > 0 && !this.ignoreSystemIds.includes(messageData.solar_system_id)) {
+                this.logger.debug('SystemId (' + messageData.solar_system_id + ') matched one in the list.  Checking characters.');
+                
+                // Check character Ids
+                var matchedAttackers = messageData.attackers.filter(d => this.mapCharacterIds.some(mapChars => mapChars.characterId == d.character_id));
+                if (matchedAttackers.length == 0) {
+                    this.logger.debug("zero character matched in list of " + this.mapCharacterIds.length);
+                    var post = "@here A ship just died in " + systemSearchResults[0].alias + " to " + messageData.attackers.length + " people, zkill link: https://zkillboard.com/kill/" + messageData.killmail_id + "/";
+                    this.updateSystemStatus(messageData.solar_system_id, 4);
+                    this.sendChainMessage(post);
+                } 
+                else {
+                    this.logger.debug("Skipped sendings, found matching characters.  Char[0]=" + matchedAttackers[0].character_id);
+                }
+            }
+            else {
+                this.fullSystemCheck(messageData.solar_system_id);
+            }
         }
     }
 
