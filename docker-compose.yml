@@ -4,7 +4,7 @@ services:
     build: .
     volumes: 
       - .:/app
-    container_name: chain-kills
+    container_name: eve-chainkills
     networks:
       - default
       - web
