@@ -15,11 +15,9 @@ Listener to zkill websocket for kills of interest in wormhole chain
   
 1. **Clone the repo**
     ```shell
-    git clone --recurse-submodules  https://github.com/commando29/eve-chainkills.git/
+    git clone  https://github.com/commando29/eve-chainkills.git/
     ```
     
-> The `PROJECT_ROOT` key is the *absolute* path to the project directory, ie if you have clone it to /app/pathfinder-containers, this is the value you should enter. If you're unsure of the absolute path, you can use the command `pwd` to get the full absolute path of the current directory.
-
 1. **Edit the *config.json
 
     
