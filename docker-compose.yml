@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  chainkills:
+    build: .
+    volumes: 
+      - .:/app
+    container_name: chain-kills
+    networks:
+      - default
+      - web
+networks:
+  default:
+    external:
+      name: pathfinder-containers_pf
+  web: 
+    external: true

@@ -1,0 +1,26 @@
+{
+    "mapIds": "2",
+    "discordChainkillWebhookId": "",
+    "discordChainkillWebhookToken": "",
+    "discordInfoWebhookId": "",
+    "discordInfoWebhookToken": "",
+    "discordCorpkillWebhookId": "",
+    "discordCorpkillWebhookToken": "",
+    "dbHost": "",
+    "dbUser": "",
+    "dbPass": "",
+    "dbName": "",
+    "logLevel": "debug",
+    "characterIdForUpdates": "",
+    "systemKillStatusResetMinutes": 90,
+    "discordStatusReportMins": 10,
+    "logLevels": [
+        {"fatal": 0},
+        {"error": 1},
+        {"warn": 2},
+        {"info": 3},
+        {"debug": 4},
+        {"trace": 5}
+    ]
+
+}
