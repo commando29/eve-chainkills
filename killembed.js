@@ -52,7 +52,7 @@ class KillEmbed {
 
             // inside a command, event listener, etc.
             var embed = new MessageEmbed()
-                .setColor(this.isKill ? this.config.discordKillNotifications.killColor : this.config.discordKillNotifications.lossColor )
+                .setColor(this.killDetails.isKill ? this.config.discordKillNotifications.killColor : this.config.discordKillNotifications.lossColor )
                 .setTitle('@victimShipName destroyed in @systemName'.replace('@systemName', this.killDetails.systemName)
                                                                     .replace('@victimShipName', this.killDetails.victimShipName))
                 .setURL(zkillLink)
