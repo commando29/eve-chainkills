@@ -99,7 +99,7 @@ class ChainKillChecker {
         }
     }
     
-    async getMapCharacterIds() {
+    async getMapCharacters() {
         try {
             this.logger.info("Getting characters from database.");
             this.mapCharacterIds = [];
