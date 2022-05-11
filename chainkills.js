@@ -4,6 +4,8 @@ const { WebhookClient } = require('discord.js');
 const util = require('util');
 const mysql = require('mysql2/promise');
 const { config } = require('process');
+const { KillDetails } = require("./killdetails");
+const { KillEmbed } = require("./killembed");
 
 // ChainKillChecker
 // logger - winston logger instance
@@ -260,14 +262,14 @@ class ChainKillChecker {
         else {
             var matchedAttackersCorp = messageData.attackers.filter(d => this.insightTrackedIds.some(item => item == d.corporation_id));
             if (matchedAttackersCorp.length > 0) {
-                this.logger.debug(`KillId ${messageData.killmail_id} got an attacker corp match.  matched corpid = ${matchedAttackersCorp.corporation_id}.`);
+                this.logger.debug(`KillId ${messageData.killmail_id} got an attacker corp match.  matched corpid = ${matchedAttackersCorp[0].corporation_id}.`);
                 isKill = true;
                 matchedCorpKill = true;
             }
             else {
                 var matchedAttackersAlli = messageData.attackers.filter(d => this.insightTrackedIds.some(item => item == d.alliance_id));
-                if (matchedAttackersAlli.length > 0) {
-                    this.logger.debug(`KillId ${messageData.killmail_id} got an attacker alliance match.  matched allianceId = ${matchedAttackersAlli.alliance_id}.`);
+                if (matchedAttackersAlli.length > 0) { 
+                    this.logger.debug(`KillId ${messageData.killmail_id} got an attacker alliance match.  matched allianceId = ${matchedAttackersAlli[0].alliance_id}.`);
                     isKill = true;
                     matchedCorpKill = true;
                 }
