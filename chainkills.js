@@ -25,6 +25,7 @@ class ChainKillChecker {
 
         this.logger.debug("Loaded config.  MapsID=" + this.mapIds.split(','));
         this.mapIdsArray = this.mapIds.split(',').filter(item => item > 0);
+        this.insightTrackedIds = config.insightTrackedIds;
 
     }
 
@@ -251,20 +252,22 @@ class ChainKillChecker {
         var matchedCorpKill = false;
         var isKill = false;
         var allianceId = messageData.victim.alliance_id ? messageData.victim.alliance_id : -1;
-        var matchedVictim = this.mapCharacters.filter(mapChars => mapChars.corporationId == messageData.victim.corporation_id || mapChars.corporationId == allianceId);
-        if (matchedVictim.length > 0) {
+        var matchedCorpKill = this.insightTrackedIds.includes(messageData.victim.corporation_id) || this.insightTrackedIds.includes(allianceId);
+        if (matchedCorpKill) {
+            this.logger.debug(`KillId ${messageData.killmail_id} got a victim match.  zKill corpid = ${messageData.victim.corporation_id}.  zkill allianceId=${messageData.victim.alliance_id}.`);
             isKill = false;
-            matchedCorpKill = true;
         }
         else {
-            var matchedAttackersCorp = messageData.attackers.filter(d => this.mapCharacters.some(mapChars => mapChars.corporationId == d.character_id));
+            var matchedAttackersCorp = messageData.attackers.filter(d => this.insightTrackedIds.some(item => item == d.corporation_id));
             if (matchedAttackersCorp.length > 0) {
+                this.logger.debug(`KillId ${messageData.killmail_id} got an attacker corp match.  matched corpid = ${matchedVictim.corporation_id}.`);
                 isKill = true;
                 matchedCorpKill = true;
             }
             else {
-                var matchedAttackersAlli = messageData.attackers.filter(d => this.mapCharacters.some(mapChars => mapChars.allianceId == d.alliance_id));
+                var matchedAttackersAlli = messageData.attackers.filter(d => this.insightTrackedIds.some(item => item == d.alliance_id));
                 if (matchedAttackersAlli.length > 0) {
+                    this.logger.debug(`KillId ${messageData.killmail_id} got an attacker alliance match.  matched allianceId = ${matchedVictim.alliance_id}.`);
                     isKill = true;
                     matchedCorpKill = true;
                 }
@@ -273,7 +276,7 @@ class ChainKillChecker {
 
 
         if (matchedCorpKill) {
-            sendCorpKillMessage(messageData, isKill);
+            this.sendCorpKillMessage(messageData, isKill);
         }
         else {
             // Check if this is a system in a map
