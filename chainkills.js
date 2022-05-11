@@ -110,14 +110,15 @@ class ChainKillChecker {
             await connection.execute('select cm.characterId, c.corporationId, c.allianceId from character_map cm inner join `character` c on c.id = cm.characterId where cm.mapId in (?) and cm.active = 1', [this.mapIds])
                 .then( ([rows,fields]) => { 
                     this.mapCharacters = rows;
+                    this.logger.info(`Found ${rows.length} map characters.`);
                 })
                 .catch(err => { throw err; });
             connection.end();
             return;
         }
         catch(error) {
-            this.logger.error("Error getMapCharacterIds : " + error);
-            await this.sendInfoMessage("Error getMapCharacterIds : " + error);
+            this.logger.error("Error getMapCharacters : " + error);
+            await this.sendInfoMessage("Error getMapCharacters : " + error);
             throw error;
         }
     }
@@ -174,7 +175,7 @@ class ChainKillChecker {
         }
     }
 
-    // 
+    // If this kill happened in a JSig, update the map to red to indicate the activity incase we jump into it
     async fullSystemCheck(systemId) {
         try {
             let jsig_pattern = /^J\d{4,}/;
@@ -212,7 +213,7 @@ class ChainKillChecker {
                 }
             }
             else if (rows.length > 0 && !rows[0].name.match(/[J]\d+3/)) {
-                this.logger.error("[fullSystemCheck] - Name match failure for systemId:" + systemId + ",name=" + rows[0].name);
+                this.logger.debug("[fullSystemCheck] - Name match failure for systemId:" + systemId + ",name=" + rows[0].name);
             }
             else {
                 // This will happen frequently for beginner systems
@@ -281,9 +282,9 @@ class ChainKillChecker {
                 this.logger.debug('SystemId (' + messageData.solar_system_id + ') matched one in the list.  Checking characters.');
                 
                 // Check character Ids
-                var matchedAttackers = messageData.attackers.filter(d => this.mapCharacterIds.some(mapChars => mapChars.characterId == d.character_id));
+                var matchedAttackers = messageData.attackers.filter(d => this.mapCharacters.some(mapChars => mapChars.characterId == d.character_id));
                 if (matchedAttackers.length == 0) {
-                    this.logger.debug("zero character matched in list of " + this.mapCharacterIds.length);
+                    this.logger.debug("zero character matched in list of " + this.mapCharacters.length);
                     var post = "@here A ship just died in " + systemSearchResults[0].alias + " to " + messageData.attackers.length + " people, zkill link: https://zkillboard.com/kill/" + messageData.killmail_id + "/";
                     this.updateSystemStatus(messageData.solar_system_id, 4);
                     this.sendChainMessage(post);
@@ -303,7 +304,7 @@ class ChainKillChecker {
 
         // Get the data from the db, comment out if debugging locally with no db
         await this.updateSystems();
-        await this.getMapCharacterIds();
+        await this.getMapCharacters();
 
     
         var sendData = {"action":"sub","channel":"killstream"};
