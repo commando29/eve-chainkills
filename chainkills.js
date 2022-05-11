@@ -260,14 +260,14 @@ class ChainKillChecker {
         else {
             var matchedAttackersCorp = messageData.attackers.filter(d => this.insightTrackedIds.some(item => item == d.corporation_id));
             if (matchedAttackersCorp.length > 0) {
-                this.logger.debug(`KillId ${messageData.killmail_id} got an attacker corp match.  matched corpid = ${matchedVictim.corporation_id}.`);
+                this.logger.debug(`KillId ${messageData.killmail_id} got an attacker corp match.  matched corpid = ${matchedAttackersCorp.corporation_id}.`);
                 isKill = true;
                 matchedCorpKill = true;
             }
             else {
                 var matchedAttackersAlli = messageData.attackers.filter(d => this.insightTrackedIds.some(item => item == d.alliance_id));
                 if (matchedAttackersAlli.length > 0) {
-                    this.logger.debug(`KillId ${messageData.killmail_id} got an attacker alliance match.  matched allianceId = ${matchedVictim.alliance_id}.`);
+                    this.logger.debug(`KillId ${messageData.killmail_id} got an attacker alliance match.  matched allianceId = ${matchedAttackersAlli.alliance_id}.`);
                     isKill = true;
                     matchedCorpKill = true;
                 }
