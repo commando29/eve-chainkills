@@ -62,7 +62,7 @@ class ChainKillChecker {
         var killEmbed = new KillEmbed(this.logger, this.config, killDetails);
         var embed = killEmbed.CreateEmbed();
 
-        const webhookClient = new WebhookClient({ id: config.discordCorpkillWebhookId, token: config.discordCorpkillWebhookToken });
+        const webhookClient = new WebhookClient({ id: this.config.discordCorpkillWebhookId, token: this.config.discordCorpkillWebhookToken });
 
         webhookClient.send({
             embeds: [embed],
