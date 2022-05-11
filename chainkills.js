@@ -55,12 +55,14 @@ class ChainKillChecker {
     }
 
     async sendCorpKillMessage (zkillMessage, isKill) {
-
+        this.logger.debug(`Sending Corp kill message`);
         var killDetails = new KillDetails(this.logger, this.config, zkillMessage);
         await killDetails.GetKillDetails();
+        this.logger.debug(`Fetched kill details, victim name = ${killDetails.victimCharacterName}`);
         killDetails.isKill = isKill;
         var killEmbed = new KillEmbed(this.logger, this.config, killDetails);
         var embed = killEmbed.CreateEmbed();
+        this.logger.debug(`Kill embed created, title = ${embed.title}`);
 
         const webhookClient = new WebhookClient({ id: this.config.discordCorpkillWebhookId, token: this.config.discordCorpkillWebhookToken });
 

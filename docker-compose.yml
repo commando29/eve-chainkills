@@ -2,9 +2,9 @@ version: "3.8"
 services:
   eve-chainkills:
     build: .
-    volumes: 
-      - .:/app
-      - .:/app/node_modules
+    #volumes: 
+    #  - .:/app
+    #  - .:/app/node_modules
     container_name: eve-chainkills
     networks:
       - default
