@@ -1,20 +1,19 @@
 {
     "mapIds": "2",
-    "discordChainkillWebhookId": "966087199969910805",
-    "discordChainkillWebhookToken": "SEhsoUjuB0INpj7-3zetQ6qyM2cJuOFq4MB9OINsqJuUEXUMRUlkwvxBRdWXa4iKydiX",
-    "discordInfoWebhookId": "971101470755815524",
-    "discordInfoWebhookToken": "njb_QkgXt6gnF0CNt66e3S_o4eQQp73jjTs8D0X2jhsDmGOHGZMC6gWMex58Sd66DLPw",
-    "discordCorpkillWebhookId": "966087199969910805",
-    "discordCorpkillWebhookToken": "SEhsoUjuB0INpj7-3zetQ6qyM2cJuOFq4MB9OINsqJuUEXUMRUlkwvxBRdWXa4iKydiX",
-    "dbHost": "172.27.0.2",
-    "dbUser": "root",
-    "dbPass": "LTWG5mF!@Y08IhSSitY",
-    "dbName": "pf",
+    "discordChainkillWebhookId": "",
+    "discordChainkillWebhookToken": "",
+    "discordInfoWebhookId": "",
+    "discordInfoWebhookToken": "",
+    "discordCorpkillWebhookId": "",
+    "discordCorpkillWebhookToken": "",
+    "dbHost": "",
+    "dbUser": "",
+    "dbPass": "",
+    "dbName": "",
     "logLevel": "debug",
-    "characterIdForUpdates": "92820023",
+    "characterIdForUpdates": "",
     "systemKillStatusResetMinutes": 90,
     "discordStatusReportMins": 10,
-    "insightTrackedIds" : [99010452,99010766],
     "logLevels": [
         {"fatal": 0},
         {"error": 1},
@@ -22,10 +21,6 @@
         {"info": 3},
         {"debug": 4},
         {"trace": 5}
-    ],
-    "discordKillNotifications": {
-        "killColor": "#00FF00",
-        "lossColor": "#FF0000"
-    } 
+    ]
 
 }
