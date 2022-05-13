@@ -72,7 +72,7 @@ class ChainKillChecker {
     }
 
     async sendInfoMessage (messageBody) {
-        this.logger.debug("Sending info message: " + message);
+        this.logger.debug("Sending info message: " + messageBody);
         const webhookClient = new WebhookClient({ id: this.config.discordInfoWebhookId, token: this.config.discordInfoWebhookToken });
 
         await webhookClient.send({
