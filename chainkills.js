@@ -341,8 +341,8 @@ class ChainKillChecker {
         });
     
         rws.addEventListener('error', function(event) {
-            this.sendInfoMessage("zkill socket error : " + event);
             this.logger.error('**** SOCKET ERROR: ' + event);
+            this.sendInfoMessage("zkill socket error : " + event);
         });
     
     };
