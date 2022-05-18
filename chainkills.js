@@ -39,6 +39,8 @@ class ChainKillChecker {
     lastUpdateTime = Date.now();
     lastDiscordStatusTime = Date.now();
 
+
+
     /**
      * Handles the actual sending request.
      * We're turning the https.request into a promise here for convenience
@@ -241,14 +243,15 @@ class ChainKillChecker {
         const messageData = JSON.parse(jsonData);
 
         // Send status update to discord if it's time.
-        if (Math.floor((Date.now() - this.lastDiscordStatusTime)/(1000*60)) > this.MIN_TO_SEND_DISCORD_STATUS) {
+        var minSinceLastStatusUpdate = Math.floor((Date.now() - this.lastDiscordStatusTime)/(1000*60));
+        if (minSinceLastStatusUpdate > this.MIN_TO_SEND_DISCORD_STATUS) {
             this.lastDiscordStatusTime = Date.now();
             await this.sendInfoMessage("Chainkills checker running.");
         }
     
         // Check if we need to update ids  Math.floor((t2-t1)/(24*3600*1000))
         var minSinceLastSystemsUpdate = Math.floor((Date.now() - this.lastUpdateTime)/(1000*60));
-        this.logger.debug('Received message, killId=' + messageData.killmail_id + ', solar_system_id=' + messageData.solar_system_id + '.  Min since last systems list update: ' + minSinceLastSystemsUpdate);
+        this.logger.debug('Received message: { "kllId":' + messageData.killmail_id + ', "solar_system_id":"' + messageData.solar_system_id + '", "min_since_last_systems_update":' + minSinceLastSystemsUpdate + ', "min_since_last_status_update":'+minSinceLastStatusUpdate+'}');
         if (minSinceLastSystemsUpdate > this.MIN_TO_GET_LATEST_SYSTEMS) {
             await this.updateSystems();
         }
