@@ -29,18 +29,22 @@ class ChainKillChecker {
         this.mapIdsArray = this.mapIds.split(',').filter(item => item > 0);
         this.insightTrackedIds = config.insightTrackedIds;
 
+        this.ZKILL_SOCKET = 'wss://zkillboard.com/websocket/';
+        this.MIN_TO_GET_LATEST_SYSTEMS = 0;
+        this.MIN_TO_SEND_DISCORD_STATUS = config.discordStatusReportMins;
+        systems = [];
+        mapCharacters = [];
+        lastUpdateTime = Date.now();
+        lastDiscordStatusTime = Date.now();
+
+        this.logger.debug('{"settings:{ "mapIds":' + this.mapIdsArray + ', "min_to_send_discord_status":"' + this.MIN_TO_SEND_DISCORD_STATUS + '", "ignore_system_ids":' + this.ignoreSystemIds + '}}');
+
+
     }
 
-    ZKILL_SOCKET = 'wss://zkillboard.com/websocket/';
-    MIN_TO_GET_LATEST_SYSTEMS = 0;
-    MIN_TO_SEND_DISCORD_STATUS = config.discordStatusReportMins;
-    systems = [];
-    mapCharacters = [];
-    lastUpdateTime = Date.now();
-    lastDiscordStatusTime = Date.now();
+    
 
-
-
+    
     /**
      * Handles the actual sending request.
      * We're turning the https.request into a promise here for convenience
