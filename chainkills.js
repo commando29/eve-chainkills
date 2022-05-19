@@ -32,10 +32,10 @@ class ChainKillChecker {
         this.ZKILL_SOCKET = 'wss://zkillboard.com/websocket/';
         this.MIN_TO_GET_LATEST_SYSTEMS = 0;
         this.MIN_TO_SEND_DISCORD_STATUS = config.discordStatusReportMins;
-        systems = [];
-        mapCharacters = [];
-        lastUpdateTime = Date.now();
-        lastDiscordStatusTime = Date.now();
+        this.systems = [];
+        this.mapCharacters = [];
+        this.lastUpdateTime = Date.now();
+        this.lastDiscordStatusTime = Date.now();
 
         this.logger.debug('{"settings:{ "mapIds":' + this.mapIdsArray + ', "min_to_send_discord_status":"' + this.MIN_TO_SEND_DISCORD_STATUS + '", "ignore_system_ids":' + this.ignoreSystemIds + '}}');
 
